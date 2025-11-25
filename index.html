@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAI Research - Assistent Educatiu Intel·ligent</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- PDF.js for PDF reading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- Mammoth.js for DOCX reading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="background-gradient"></div>
+
+    <nav class="glass-nav">
+        <div class="logo">EduAI <span class="highlight">Research</span></div>
+        <ul class="nav-links">
+            <li><a href="#home" class="active" data-page="home">Inici</a></li>
+            <li><a href="#context" data-page="context">Marc Teòric</a></li>
+            <li><a href="#chat" data-page="chat">Assistent IA</a></li>
+            <li><a href="#dashboard" data-page="dashboard">Docents</a></li>
+        </ul>
+    </nav>
+
+    <main id="app">
+        <!-- HOME SECTION -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <h1 class="fade-in">L'Educació del <span class="text-gradient">Futur</span></h1>
+                <p class="subtitle fade-in-delay">Un projecte de recerca sobre l'impacte de la IA i la seva aplicació
+                    pràctica a l'aula.</p>
+
+                <div class="abstract-card glass-card fade-in-delay-2">
+                    <h3 style="margin-bottom: 20px;">Projecte que neix de la pregunta:</h3>
+                    <p style="margin-bottom: 30px;"><strong>Pot ser la
+                            intel·ligència artificial una eina útil
+                            per millorar l'educació?</strong></p>
+                    <p style="font-style: italic;">Es presenta una solució pràctica i efectiva: un assistent educatiu
+                        tancat pel centre i segur.</p>
+                    <button class="cta-button" onclick="navigateTo('chat')">Provar l'Assistent</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTEXT SECTION -->
+        <section id="context" class="page">
+            <div class="content-container">
+                <h2>Marc Teòric</h2>
+                <div class="grid-layout">
+                    <div class="card glass-card">
+                        <i data-lucide="history"></i>
+                        <h3>Evolució Tecnològica</h3>
+                        <p>Des de la transformació social derivada de la digitalització fins als riscos i avantatges de
+                            la tecnologia moderna.</p>
+                    </div>
+                    <div class="card glass-card">
+                        <i data-lucide="brain-circuit"></i>
+                        <h3>Intel·ligència Artificial</h3>
+                        <p>Funcionament, tipus, limitacions i, sobretot, el seu impacte ètic i regulatori en l'àmbit
+                            educatiu.</p>
+                    </div>
+                    <div class="card glass-card">
+                        <i data-lucide="bot"></i>
+                        <h3>Robòtica i Automatització</h3>
+                        <p>Implicacions laborals i la divergència entre formes de vida intel·ligent i androides.</p>
+                    </div>
+                </div>
+
+                <div class="text-block glass-card">
+                    <h3>Hipòtesi de Treball</h3>
+                    <blockquote>"La intel·ligència artificial aplicada a un assistent digital millora el procés educatiu
+                        i facilita l'aprenentatge."</blockquote>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHAT SECTION -->
+        <section id="chat" class="page">
+            <div class="chat-container glass-panel">
+                <div class="chat-header">
+                    <div class="avatar-bot">
+                        <i data-lucide="sparkles"></i>
+                    </div>
+                    <div class="chat-info">
+                        <h3>Assistent Educatiu</h3>
+                        <span class="status">En línia • Mode Educatiu</span>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot">
+                        <div class="message-content">
+                            Hola! Soc el teu assistent educatiu. Puc ajudar-te amb dubtes sobre el temari, resoldre
+                            preguntes o guiar-te en el teu aprenentatge. Què vols saber avui?
+                        </div>
+                        <div class="message-meta">Ara mateix</div>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <input type="text" id="user-input" placeholder="Escriu la teva pregunta aquí..." autocomplete="off">
+                    <button id="send-btn" class="send-button">
+                        <i data-lucide="send"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- DASHBOARD SECTION -->
+        <section id="dashboard" class="page">
+            <div class="dashboard-container">
+                <div class="dashboard-header">
+                    <h2>Panell de Control per a Docents</h2>
+                </div>
+                <p class="desc">Aquí els docents podeu pujar contingut verificat per entrenar l'assistent.</p>
+
+                <div class="upload-zone glass-card" id="drop-zone" style="margin-top: 20px;">
+                    <i data-lucide="upload-cloud" class="large-icon"></i>
+                    <h3>Pujar Material Docent</h3>
+                    <p>Inserta fitxers PDF, DOCX o TXT aquí</p>
+                    <button class="secondary-button"
+                        onclick="document.getElementById('file-upload').click()">Seleccionar Arxius</button>
+                    <input type="file" id="file-upload" hidden multiple accept=".txt,.pdf,.docx">
+                </div>
+
+                <div id="file-list" class="file-list">
+                    <!-- Uploaded files will appear here -->
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card glass-card">
+                        <h4>Consultes Resoltes</h4>
+                        <span class="number">1,248</span>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <h4>Temes Actius</h4>
+                        <span class="number" id="active-topics-count">12</span>
+                    </div>
+                    <div class="stat-card glass-card">
+                        <h4>Precisió de Resposta</h4>
+                        <span class="number">98.5%</span>
+                    </div>
+                </div>
+            </div>
+            <button id="logout-btn" class="secondary-button"
+                style="margin-top: 50px; padding: 0.5rem 0.7rem; font-size: 1.0rem;">
+                <i data-lucide="log-out" style="width: 20px; height: 15px; margin-right: 5px;"></i> Tancar
+                Sessió
+            </button>
+        </section>
+    </main>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal glass-card">
+            <h2>Accés Docent</h2>
+            <p>Introdueix el teu correu electrònic autoritzat per accedir al panell.</p>
+            <input type="email" id="email-input" placeholder="nom@escola.cat" autocomplete="off">
+            <input type="password" id="password-input" placeholder="Contrasenya" autocomplete="off">
+            <button id="login-btn" class="cta-button">Accedir</button>
+            <p id="login-error" class="error-msg"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
