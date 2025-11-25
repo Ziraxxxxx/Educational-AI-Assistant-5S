@@ -259,12 +259,8 @@ const staticKnowledgeBase = [
         response: "La IA en l'educació pot personalitzar l'aprenentatge i oferir tutoria 24/7."
     },
     {
-        keywords: ['riscos', 'perills'],
-        response: "Alguns riscos inclouen la privacitat de les dades i el biaix algorítmic."
-    },
-    {
         keywords: ['autor', 'treball'],
-        response: "Aquest és un Treball de Recerca sobre l'impacte de la IA en l'educació."
+        response: "Aquest és un Treball de Recerca sobre l'impacte de la IA en l'educació i la seva aplicació a l'aula, amb la autoría de Eduardo Muñoz."
     }
 ];
 
