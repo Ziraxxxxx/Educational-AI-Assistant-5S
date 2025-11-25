@@ -1,0 +1,14 @@
+feat: Afegeix una nova funcionalitat (ex: nova secció, element interactiu, etc.)
+fix: Correcció d’un error de funcionament
+docs: Modificació de textos o documentació (README, comentaris...)
+style: Canvis visuals o d’estil que no afecten el comportament
+refactor: Reestructuració del codi sense modificar el funcionament final
+test: Afegeix o modifica proves (tests)
+chore: Tareas menors, configuració, neteja general  
+perf: Millora del rendiment de la página (Ex. Imatges menys pesades)
+build: Canvis relacionats amb la generació o desplegament del projecte
+ci: Configuració d’integració contínua
+init: Realicacions inicials per començar el projecteMillora del rendiment de la página (Ex. Imatges menys pesades)
+build: Canvis relacionats amb la generació o desplegament del projecte
+ci: Configuració d’integració contínua
+init: Realicacions inicials per començar el projecte
