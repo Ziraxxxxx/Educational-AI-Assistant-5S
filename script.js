@@ -363,7 +363,7 @@ async function getBotResponse(input) {
 
     // 2. Check for API Config
     if (!API_KEY || API_KEY === 'TU_CLAU_API_AQUI') {
-        return "Error de configuració: La clau API no està configurada al codi (script.js).";
+        return "[Error de configuració]: La clau API no està configurada al codi (script.js).";
     }
 
     // 3. Gather Context (RAG Simulation)
@@ -371,7 +371,7 @@ async function getBotResponse(input) {
     const files = await FileDatabase.getAllFiles();
 
     if (files.length === 0) {
-        return "No hi ha documents carregats per respondre a la teva pregunta. Si us plau, puja material al panell de docents.";
+        return "No hi ha documents carregats per respondre a la teva pregunta. Si us plau, demana a un docent que pugui el material al panell de docents.";
     }
 
     let context = "";
@@ -379,7 +379,7 @@ async function getBotResponse(input) {
         context += `\n--- Document: ${file.name} ---\n${file.content}\n`;
     });
 
-    // Truncate context if too long to avoid huge payloads (simple heuristic)
+    // Truncar el context si és massa llarg per evitar càrregues útils enormes (heurística simple)
     if (context.length > 50000) context = context.substring(0, 50000) + "... [truncat]";
 
     const systemPrompt = `
@@ -396,6 +396,8 @@ async function getBotResponse(input) {
         3. Respon sempre en Català, independentment de l'idioma de la pregunta.
         4. Sigues clar i didàctic.
         5. Si la pregunta no té cap relació amb el context proporcionat, digues: "No tinc informació suficient en els documents proporcionats per respondre aquesta pregunta."
+        6. Si existeix text tipus "**text**" o "*text*" en el context, respon amb el text en negreta.
+        7. Si existeix text tipus "~~text~~" en el context, respon amb el text en riscada.
 
         Pregunta de l'usuari: ${input}
         
@@ -425,7 +427,7 @@ async function handleSendMessage() {
     addMessage(text, 'user');
     userInput.value = '';
 
-    // Simulate thinking
+    // Temps de pensament...
     const loadingDiv = document.createElement('div');
     loadingDiv.className = 'message bot';
     loadingDiv.innerHTML = '<div class="message-content">...</div>';
@@ -444,13 +446,13 @@ userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleSendMessage();
 });
 
-// Initialize
+// Inicialitzar
 (async () => {
     await FileDatabase.init();
     lucide.createIcons();
 
-    // Check if we are on dashboard and need auth (refresh case)
+    // Comprovar si som al tauler de control i necessitem autenticació (actualitzar el cas)
     if (window.location.hash === '#dashboard' && !currentUser) {
-        navigateTo('home'); // Redirect to home if trying to deep link without auth
+        navigateTo('home'); // Redirecciona a la pàgina d'inici si s'intenta establir un enllaç profund sense autenticació.
     }
 })();
