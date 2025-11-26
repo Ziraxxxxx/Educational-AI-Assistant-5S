@@ -251,12 +251,24 @@ const staticKnowledgeBase = [
         response: "Hola! Soc el teu assistent educatiu. En què et puc ajudar avui?"
     },
     {
+        keywords: ['agraïment', 'gràcies', 'gracies'],
+        response: "De res! Estic aquí per ajudar-te amb tot el que necessitis."
+    },
+    {
         keywords: ['ia', 'intel·ligència artificial', 'què és'],
         response: "La Intel·ligència Artificial (IA) és una branca de la informàtica que busca crear sistemes capaços de realitzar tasques que normalment requereixen intel·ligència humana."
     },
     {
         keywords: ['educació', 'escola', 'aprendre'],
         response: "La IA en l'educació pot personalitzar l'aprenentatge i oferir tutoria 24/7."
+    },
+    {
+        keywords: ['problemes', 'errors', 'precaucions'],
+        response: "La IA pot cometre errors o donar informació incompleta; cal supervisió humana i ús responsable."
+    },
+    {
+        keywords: ["com funciona l'assistent", 'explicació', 'detalls'],
+        response: "L'assistent utilitza models d'IA per analitzar documents i generar respostes basades en el contingut carregat per docents."
     },
     {
         keywords: ['autor', 'treball'],
@@ -315,7 +327,7 @@ async function getBotResponse(input) {
         }
     }
 
-    return "Ho sento, no tinc informació sobre això en la meva base de dades ni en els arxius pujats.";
+    return "Ho sento, no tinc informació sobre això en la meva base de dades. Si vols, pots informar a direcció, caps de departaments o l'encarregat TIC perquè afegeixin la informació pertinent.";
 }
 
 async function handleSendMessage() {
