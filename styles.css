@@ -232,6 +232,20 @@ blockquote {
     gap: 1rem;
 }
 
+.logo-ins {
+    height: 65scpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+.logo-ins img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+}
+
 .avatar-bot {
     width: 40px;
     height: 40px;
