@@ -1,5 +1,5 @@
 // --- CONFIGURATION ---
-const AUTHORIZED_EMAILS = ['docente@eduai.com', 'admin@eduai.com', 'test@eduai.com'];
+const AUTHORIZED_EMAILS = ['direccio@institutlescincsenies.cat', 'tic@institutlescincsenies.cat', 'capdedepartament@institutlescincsenies.cat'];
 const DB_NAME = 'EduAIDB';
 const DB_VERSION = 1;
 
