@@ -1,5 +1,5 @@
 // --- CONFIGURATION ---
-const AUTHORIZED_EMAILS = ['direccio@institutlescincsenies.cat', 'tic@institutlescincsenies.cat', 'capdedepartament@institutlescincsenies.cat'];
+const AUTHORIZED_EMAILS = ['direccio@inslescincsenies.cat', 'tic@inslescincsenies.cat', 'capdedepartament@inslescincsenies.cat'];
 const DB_NAME = 'EduAIDB';
 const DB_VERSION = 1;
 
@@ -239,6 +239,69 @@ window.deleteFile = async (id) => {
     }
 };
 
+// --- API CONFIGURATION (HARDCODED) ---
+// Selecciona el proveïdor: 'gemini' o 'openai'
+const API_PROVIDER = 'gemini';
+
+// Posa aquí la teva clau API real (TU_CLAU_API_AQUI)
+const API_KEY = 'AIzaSyAN8J05bp2VMKIEj3GI3xF5stViDlPPMgM';
+
+// --- API CLIENTS ---
+async function callGemini(prompt, apiKey) {
+    let model = 'gemini-2.0-flash';
+    let url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    let response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+        })
+    });
+
+    let data = await response.json();
+
+    if (data.error) {
+        console.error("Gemini Error:", data.error);
+
+        // Intentem llistar els models disponibles
+        try {
+            const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+            const listResp = await fetch(listUrl);
+            const listData = await listResp.json();
+
+            if (listData.models) {
+                const modelNames = listData.models.map(m => m.name.split('/').pop()).join(', ');
+                throw new Error(`Error de model (${model}). Models disponibles per a la teva clau: ${modelNames}`);
+            }
+        } catch (listError) {
+            if (listError.message.includes('Models disponibles')) throw listError;
+        }
+
+        throw new Error(data.error.message + " (Verifica que l'API 'Generative Language API' estigui habilitada a Google Cloud Console)");
+    }
+
+    return data.candidates[0].content.parts[0].text;
+}
+
+async function callOpenAI(prompt, apiKey) {
+    const url = 'https://api.openai.com/v1/chat/completions';
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: prompt }]
+        })
+    });
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.choices[0].message.content;
+}
+
 // --- CHAT LOGIC (AI) ---
 const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
@@ -255,19 +318,11 @@ const staticKnowledgeBase = [
         response: "De res! Estic aquí per ajudar-te amb tot el que necessitis."
     },
     {
-        keywords: ['ia', 'intel·ligència artificial', 'què és'],
-        response: "La Intel·ligència Artificial (IA) és una branca de la informàtica que busca crear sistemes capaços de realitzar tasques que normalment requereixen intel·ligència humana."
-    },
-    {
-        keywords: ['educació', 'escola', 'aprendre'],
-        response: "La IA en l'educació pot personalitzar l'aprenentatge i oferir tutoria 24/7."
-    },
-    {
         keywords: ['problemes', 'errors', 'precaucions'],
         response: "La IA pot cometre errors o donar informació incompleta; cal supervisió humana i ús responsable."
     },
     {
-        keywords: ["com funciona l'assistent", 'explicació', 'detalls'],
+        keywords: ["assistent"],
         response: "L'assistent utilitza models d'IA per analitzar documents i generar respostes basades en el contingut carregat per docents."
     },
     {
@@ -306,28 +361,61 @@ async function getBotResponse(input) {
 
     if (staticMatch) return staticMatch.response;
 
-    // 2. Check Uploaded Files (RAG Simulation)
+    // 2. Check for API Config
+    if (!API_KEY || API_KEY === 'TU_CLAU_API_AQUI') {
+        return "Error de configuració: La clau API no està configurada al codi (script.js).";
+    }
+
+    // 3. Gather Context (RAG Simulation)
     if (!db) await FileDatabase.init();
     const files = await FileDatabase.getAllFiles();
 
-    // Simple search: check if any file content contains the keywords from the input
-    // We split input into words and check if significant words appear in file content
-    const words = lowerInput.split(' ').filter(w => w.length > 3); // Filter short words
-
-    for (const file of files) {
-        const contentLower = file.content.toLowerCase();
-        // Check if significant words match
-        const matchCount = words.filter(w => contentLower.includes(w)).length;
-
-        if (matchCount > 0 && matchCount >= words.length * 0.5) { // If 50% of words match
-            // Extract a snippet
-            const index = contentLower.indexOf(words[0]);
-            const snippet = file.content.substring(Math.max(0, index - 50), Math.min(file.content.length, index + 200));
-            return `Basat en el document "${file.name}": ...${snippet}...`;
-        }
+    if (files.length === 0) {
+        return "No hi ha documents carregats per respondre a la teva pregunta. Si us plau, puja material al panell de docents.";
     }
 
-    return "Ho sento, no tinc informació sobre això en la meva base de dades. Si vols, pots informar a direcció, caps de departaments o l'encarregat TIC perquè afegeixin la informació pertinent.";
+    let context = "";
+    files.forEach(file => {
+        context += `\n--- Document: ${file.name} ---\n${file.content}\n`;
+    });
+
+    // Truncate context if too long to avoid huge payloads (simple heuristic)
+    if (context.length > 50000) context = context.substring(0, 50000) + "... [truncat]";
+
+    const systemPrompt = `
+        Ets un assistent educatiu intel·ligent de l'Institut Les Cinc Sénies.
+        Tens accés a la següent informació de context extreta de documents docents:
+        
+        === CONTEXT ===
+        ${context}
+        === FI DEL CONTEXT ===
+
+        Instruccions:
+        1. Respon a la pregunta de l'usuari utilitzant la informació del context.
+        2. Si la resposta es pot deduir del context, fes-ho.
+        3. Respon sempre en Català, independentment de l'idioma de la pregunta.
+        4. Sigues clar i didàctic.
+        5. Si la pregunta no té cap relació amb el context proporcionat, digues: "No tinc informació suficient en els documents proporcionats per respondre aquesta pregunta."
+
+        Pregunta de l'usuari: ${input}
+        
+        Resposta:
+    `;
+
+    // console.log("--- DEBUG CONTEXT ---");
+    // console.log("Files found:", files.length);
+    // console.log("Context length:", context.length);
+
+    try {
+        if (API_PROVIDER === 'gemini') {
+            return await callGemini(systemPrompt, API_KEY);
+        } else {
+            return await callOpenAI(systemPrompt, API_KEY);
+        }
+    } catch (error) {
+        console.error(error);
+        return `Error connectant amb la IA: ${error.message}. Verifica la teva clau API.`;
+    }
 }
 
 async function handleSendMessage() {
