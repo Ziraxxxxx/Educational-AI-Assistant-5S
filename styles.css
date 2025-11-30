@@ -37,7 +37,7 @@ body {
     z-index: -1;
 }
 
-/* Typography */
+/* Tipografia */
 h1,
 h2,
 h3,
@@ -53,7 +53,7 @@ h4 {
     -webkit-text-fill-color: transparent;
 }
 
-/* Navigation */
+/* Navegació */
 .glass-nav {
     position: fixed;
     top: 0;
@@ -564,7 +564,7 @@ blockquote {
     min-height: 1.2em;
 }
 
-/* Animations */
+/* Animacions */
 @keyframes fadeIn {
     from {
         opacity: 0;

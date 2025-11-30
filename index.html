@@ -24,7 +24,6 @@
     <!-- Mammoth.js for DOCX reading -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -42,7 +41,7 @@
     </nav>
 
     <main id="app">
-        <!-- HOME SECTION -->
+        <!-- SECCIÓ D'INICI -->
         <section id="home" class="page active">
             <div class="hero">
                 <h1 class="fade-in">L'Educació del <span class="text-gradient">Futur</span></h1>
@@ -61,7 +60,7 @@
             </div>
         </section>
 
-        <!-- CONTEXT SECTION -->
+        <!-- SECCIÓ DE CONTEXT MARC TEÒRIC -->
         <section id="context" class="page">
             <div class="content-container">
                 <h2>Marc Teòric</h2>
@@ -76,26 +75,27 @@
                         <h3>Context i Objectiu</h3>
                         <p>Des de la transformació social derivada de la digitalització fins als riscos i avantatges de
                             la tecnologia moderna. Es va buscar el desenvolupament d’un assistent educatiu amb IA que
-                            ajudi els estudiantes respondint preguntes.</p>
+                            ajudi els estudiantes responent preguntes.</p>
                     </div>
                     <div class="card glass-card">
                         <i data-lucide="brain-circuit"></i>
                         <h3>Teoria i fonaments</h3>
-                        <p>IA i Machine Learning aplicats a l’educació. Funcionament, tipus, limitacions i, sobretot, el
-                            seu impacte ètic i regulatori.</p>
+                        <p>IA i Machine Learning aplicats a l’educació. Funcionament, tipus, limitacions i la seva
+                            percepció ètica i regulatoria.</p>
                     </div>
                     <div class="card glass-card">
                         <i data-lucide="bot"></i>
                         <h3>Projecte pràctic i resultats</h3>
-                        <p>Assistente web amb Intel·ligència Artificial que processa documents i respon preguntes de
+                        <p>Assistent web amb Intel·ligència Artificial que processa documents i respon preguntes de
                             manera contextual, demostrant la viabilitat de la IA a l’educació i la necessitat de
                             supervisió humana.</p>
                     </div>
                 </div>
             </div>
+            <button class="cta-button" onclick="navigateTo('chat')">Provar l'Assistent</button>
         </section>
 
-        <!-- CHAT SECTION -->
+        <!-- SECCIÓ DE CHAT (Xat IA) -->
         <section id="chat" class="page">
             <div class="chat-container glass-panel">
                 <div class="chat-header">
@@ -130,7 +130,7 @@
             </div>
         </section>
 
-        <!-- DASHBOARD SECTION -->
+        <!-- DASHBOARD DOCENTS -->
         <section id="dashboard" class="page">
             <div class="dashboard-container">
                 <div class="dashboard-header">
@@ -148,7 +148,7 @@
                 </div>
 
                 <div id="file-list" class="file-list">
-                    <!-- Uploaded files will appear here -->
+                    <!-- Els fitxers pujats apareixeran aquí -->
                 </div>
 
                 <div class="stats-grid">
@@ -174,12 +174,12 @@
         </section>
     </main>
 
-    <!-- LOGIN MODAL -->
+    <!-- INICI DE SESSIÓ -->
     <div id="login-modal" class="modal-overlay">
         <div class="modal glass-card">
             <h2>Accés Docent</h2>
             <p>Introdueix el teu correu electrònic autoritzat per accedir al panell.</p>
-            <input type="email" id="email-input" placeholder="nom@institutlescincsenies.cat" autocomplete="off">
+            <input type="email" id="email-input" placeholder="nom@inslescincsenies.cat" autocomplete="off">
             <input type="password" id="password-input" placeholder="Contrasenya" autocomplete="off">
             <button id="login-btn" class="cta-button">Accedir</button>
             <p id="login-error" class="error-msg"></p>

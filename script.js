@@ -1,9 +1,9 @@
-// --- CONFIGURATION ---
-const AUTHORIZED_EMAILS = ['direccio@inslescincsenies.cat', 'tic@inslescincsenies.cat', 'capdedepartament@inslescincsenies.cat'];
+// --- CONFIGURACIÓ ---
+const AUTHORIZED_EMAILS = ['direccio@inslescincsenies.cat', 'dev@inslescincsenies.cat', 'tic@inslescincsenies.cat', 'capdedepartament@inslescincsenies.cat'];
 const DB_NAME = 'EduAIDB';
 const DB_VERSION = 1;
 
-// --- STATE ---
+// --- ESTAT ---
 let currentUser = localStorage.getItem('currentUser');
 let db = null;
 
@@ -63,29 +63,29 @@ const FileDatabase = {
     }
 };
 
-// --- NAVIGATION ---
+// --- NAVIGACIÓ ---
 const pages = document.querySelectorAll('.page');
 const navLinks = document.querySelectorAll('.nav-links a');
 const loginModal = document.getElementById('login-modal');
 
 function navigateTo(pageId) {
-    // Auth Check for Dashboard
+    // Comprovació d'autenticació per a la pàgina de Dashboard
     if (pageId === 'dashboard' && !currentUser) {
         showLoginModal();
         return;
     }
 
-    // Update active page
+    // Actualització de la pàgina activa
     pages.forEach(page => {
         if (page.id === pageId) {
             page.classList.add('active');
-            if (pageId === 'dashboard') loadFiles(); // Load files when entering dashboard
+            if (pageId === 'dashboard') loadFiles(); // Carrega fitxers en entrar al tauler
         } else {
             page.classList.remove('active');
         }
     });
 
-    // Update active nav link
+    // Actualització de l'enllaç de navegació actiu
     navLinks.forEach(link => {
         if (link.dataset.page === pageId) {
             link.classList.add('active');
@@ -103,7 +103,7 @@ navLinks.forEach(link => {
     });
 });
 
-// --- AUTHENTICATION ---
+// --- AUTENTICACIÓ ---
 function showLoginModal() {
     loginModal.classList.add('active');
 }
@@ -134,19 +134,19 @@ document.getElementById('login-btn').addEventListener('click', () => {
     }
 });
 
-// Close modal on outside click
+// Tancament del modal al fer clic fora
 loginModal.addEventListener('click', (e) => {
     if (e.target === loginModal) hideLoginModal();
 });
 
-// Logout Logic
+// Tancament de la sessió (Logout Logic)
 document.getElementById('logout-btn').addEventListener('click', () => {
     currentUser = null;
     localStorage.removeItem('currentUser');
     navigateTo('home');
 });
 
-// --- FILE UPLOAD & MANAGEMENT ---
+// --- GESTIÓ DE FITXERS (FILE UPLOAD & MANAGEMENT) ---
 const fileInput = document.getElementById('file-upload');
 const fileList = document.getElementById('file-list');
 const activeTopicsCount = document.getElementById('active-topics-count');
@@ -160,7 +160,7 @@ fileInput.addEventListener('change', async (e) => {
             name: file.name,
             type: file.type,
             size: file.size,
-            content: content, // Store text content for AI
+            content: content, // Emmagatzema contingut de text per a la IA
             date: new Date().toISOString()
         };
 
@@ -177,7 +177,7 @@ async function readFileContent(file) {
     } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.name.endsWith('.docx')) {
         return await readDocxContent(file);
     } else {
-        // Default to text for everything else (including .txt)
+        // Text predeterminat per a tota la resta (incloent .txt)
         return new Promise((resolve) => {
             const reader = new FileReader();
             reader.onload = (e) => resolve(e.target.result);
@@ -240,7 +240,7 @@ window.deleteFile = async (id) => {
 };
 
 // --- API CONFIGURATION (HARDCODED) ---
-// Selecciona el proveïdor: 'gemini' o 'openai'
+// Selecciona l'IA: 'gemini' o 'openai'
 const API_PROVIDER = 'gemini';
 
 // Posa aquí la teva clau API real (TU_CLAU_API_AQUI)
@@ -307,7 +307,7 @@ const chatMessages = document.getElementById('chat-messages');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-// Predefined responses
+// Respostes predefinides
 const staticKnowledgeBase = [
     {
         keywords: ['hola', 'bon dia', 'salut'],
@@ -316,10 +316,6 @@ const staticKnowledgeBase = [
     {
         keywords: ['agraïment', 'gràcies', 'gracies'],
         response: "De res! Estic aquí per ajudar-te amb tot el que necessitis."
-    },
-    {
-        keywords: ['problemes', 'errors', 'precaucions'],
-        response: "La IA pot cometre errors o donar informació incompleta; cal supervisió humana i ús responsable."
     },
     {
         keywords: ["assistent"],
@@ -366,7 +362,7 @@ async function getBotResponse(input) {
         return "[Error de configuració]: La clau API no està configurada al codi (script.js).";
     }
 
-    // 3. Gather Context (RAG Simulation)
+    // 3. Recull el Context (RAG Simulation)
     if (!db) await FileDatabase.init();
     const files = await FileDatabase.getAllFiles();
 
@@ -404,6 +400,7 @@ async function getBotResponse(input) {
         Resposta:
     `;
 
+    // DEBUGGING
     // console.log("--- DEBUG CONTEXT ---");
     // console.log("Files found:", files.length);
     // console.log("Context length:", context.length);
