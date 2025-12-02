@@ -1,0 +1,2 @@
+- 🎓 Educational Assistant based on Artificial Intelligence
+- 🌐 [Presentation video](Link)  
