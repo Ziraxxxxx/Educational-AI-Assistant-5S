@@ -232,8 +232,114 @@ blockquote {
     gap: 1rem;
 }
 
+.chat-header { flex-wrap: wrap; }
+
+/* AI Config (header) */
+.ai-config {
+    display:flexbox;
+    gap: 0.5rem;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 4px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    flex-shrink: 1;
+    max-width: 100%;
+    margin: 25px; 
+}
+
+.ai-config input[type="password"],
+.ai-config input[type="text"] {
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.08);
+    padding: 6px 10px;
+    border-radius: 8px;
+    color: #111111;
+    font-size: 0.9rem;
+    width: auto;
+    min-width: 230px;
+    outline: none;
+    transition: box-shadow 0.18s ease, border-color 0.18s ease;
+    flex: 1 1 auto; /* allow the input to expand to available space */
+}
+
+.ai-config input[type="password"]::placeholder {
+    color: var(--text-muted);
+}
+
+.ai-config input[type="password"]:focus {
+    box-shadow: 0 4px 18px rgba(157,78,221,0.12);
+    border-color: var(--secondary-color);
+}
+
+.ai-config select {
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.08);
+    color: #111111;
+    padding: 6px 10px;
+    border-radius: 8px;
+    appearance: none;
+    -webkit-appearance: none;
+    font-size: 0.9rem;
+    width: 150px;
+    min-width: 110px;
+    cursor: pointer;
+}
+
+/* Dropdown options: interior en negre amb text blanc */
+.ai-config select option {
+    background: #0b0b0b;
+    color: #ffffff;
+}
+
+.ai-config select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 4px 18px rgba(157,78,221,0.08);
+}
+
+.ai-config button.secondary-button {
+    padding: 6px 10px;
+    border-radius: 9px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-color);
+    cursor: pointer;
+    font-weight: 600;
+    align-self: center;
+    height: 36px;
+    margin-left: 150px;
+    margin-top: 5px; 
+    margin-bottom: 5px; 
+
+}
+
+.ai-config button.secondary-button:hover {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    border-color: transparent;
+    box-shadow: 0 6px 20px rgba(123,44,191,0.25);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.api-status {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 3px;
+    min-width: 110px;
+    text-align: center;
+}
+
+/* Responsive: compact the AI config on small screens */
+@media (max-width: 860px) {
+    .ai-config input[type="password"] { display: none; }
+    .ai-config select { width: 140px; }
+    .api-status { display: none; }
+    .ai-config { max-width: 100%; padding: 6px; }
+}
+
 .logo-ins {
-    height: 65scpx;
+    height: 65px;
     display: flex;
     align-items: center;
     justify-content: center;

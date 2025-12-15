@@ -242,46 +242,65 @@ window.deleteFile = async (id) => {
 // --- API CONFIGURATION (HARDCODED) ---
 // Selecciona l'IA: 'gemini' o 'openai'
 const API_PROVIDER = 'gemini';
+// La clau i el model es guarden a localStorage per evitar exposar-la al codi.
+let API_KEY = localStorage.getItem('eduai_api_key') || '';
+let USER_SELECTED_MODEL = localStorage.getItem('eduai_model') || '';
 
-// Posa aquí la teva clau API real (TU_CLAU_API_AQUI)
-const API_KEY = 'AIzaSyAN8J05bp2VMKIEj3GI3xF5stViDlPPMgM';
-
-// --- API CLIENTS ---
+// --- API CLIENTS ---  
 async function callGemini(prompt, apiKey) {
-    let model = 'gemini-2.0-flash';
-    let url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    let preferredModels = ['gemma-3-4b-it', 'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-flash-latest', 'gemini-2.0-flash','gemini-1.5-pro', 'gemini-1.5-flash', 'gemma-2-9b-it', 'gemma-2-9b', 'gemma-2-27b-it', 'gemma-2-27b', 'gemini-pro', 'gemini-pro-vision'];
 
-    let response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-        })
-    });
-
-    let data = await response.json();
-
-    if (data.error) {
-        console.error("Gemini Error:", data.error);
-
-        // Intentem llistar els models disponibles
-        try {
-            const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
-            const listResp = await fetch(listUrl);
-            const listData = await listResp.json();
-
-            if (listData.models) {
-                const modelNames = listData.models.map(m => m.name.split('/').pop()).join(', ');
-                throw new Error(`Error de model (${model}). Models disponibles per a la teva clau: ${modelNames}`);
-            }
-        } catch (listError) {
-            if (listError.message.includes('Models disponibles')) throw listError;
-        }
-
-        throw new Error(data.error.message + " (Verifica que l'API 'Generative Language API' estigui habilitada a Google Cloud Console)");
+    // Si l'usuari ha triat un model a la UI, provar-lo primer
+    const userModel = localStorage.getItem('eduai_model');
+    if (userModel) {
+        preferredModels = [userModel, ...preferredModels.filter(m => m !== userModel)];
     }
 
-    return data.candidates[0].content.parts[0].text;
+    // Intenta con modelos preferidos primero, devuelve la primera respuesta válida
+    for (const model of preferredModels) {
+        try {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+
+            const data = await response.json();
+
+            if (!data || data.error) {
+                // Si el modelo no està disponible amb aquesta clau o hi ha un altre error, continuar amb el següent model
+                console.warn(`Gemini model ${model} error:`, data && data.error ? data.error : 'No data');
+                continue;
+            }
+
+            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+                return data.candidates[0].content.parts[0].text;
+            }
+        } catch (err) {
+            console.warn(`Attempt to use model ${model} failed:`, err.message || err);
+            continue;
+        }
+    }
+
+    // Si cap dels models preferits funciona, intentem llistar els models disponibles per a la clau i donar un missatge clar
+    try {
+        const listUrl = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+        const listResp = await fetch(listUrl);
+        const listData = await listResp.json();
+
+        if (listData && listData.models && listData.models.length > 0) {
+            const modelNames = listData.models.map(m => m.name.split('/').pop()).join(', ');
+            throw new Error(`Error de model. Models disponibles per a la teva clau: ${modelNames}`);
+        } else {
+            throw new Error("No s'han pogut obtenir els models disponibles per a la teva clau. Revisa la clau i permisos.");
+        }
+    } catch (listError) {
+        if (listError.message) throw new Error(listError.message + " (Verifica que l'API 'Generative Language API' estigui habilitada i la clau és correcta)");
+        throw new Error("Error desconegut en contactar amb Gemini. Verifica la teva clau API.");
+    }
 }
 
 async function callOpenAI(prompt, apiKey) {
@@ -358,8 +377,8 @@ async function getBotResponse(input) {
     if (staticMatch) return staticMatch.response;
 
     // 2. Check for API Config
-    if (!API_KEY || API_KEY === 'TU_CLAU_API_AQUI') {
-        return "[Error de configuració]: La clau API no està configurada al codi (script.js).";
+    if (!API_KEY) {
+        return "[ERROR]: No s'ha configurat la clau API. Ves a la secció del xat (capçalera) i introdueix la teva clau i selecciona un model, prem 'Guardar'. No comparteixis la clau públicament.";
     }
 
     // 3. Recull el Context (RAG Simulation)
@@ -392,9 +411,7 @@ async function getBotResponse(input) {
         3. Respon sempre en Català, independentment de l'idioma de la pregunta.
         4. Sigues clar i didàctic.
         5. Si la pregunta no té cap relació amb el context proporcionat, digues: "No tinc informació suficient en els documents proporcionats per respondre aquesta pregunta."
-        6. Si existeix text tipus "**text**" o "*text*" en el context, respon amb el text en negreta.
-        7. Si existeix text tipus "~~text~~" en el context, respon amb el text en riscada.
-
+        6. Si existeix text tipus: "**text**", "*text*" *text*, **text** en el context, respon amb el text sempre així: text
         Pregunta de l'usuari: ${input}
         
         Resposta:
@@ -443,6 +460,51 @@ userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') handleSendMessage();
 });
 
+// --- AI CONFIG UI HANDLING ---
+function initAIConfigUI() {
+    const apiKeyInput = document.getElementById('api-key-input');
+    const modelSelect = document.getElementById('model-select');
+    const saveBtn = document.getElementById('save-ai-config');
+    const statusDiv = document.getElementById('api-status');
+
+    if (!apiKeyInput || !modelSelect || !saveBtn) return;
+
+    // Models sugeridos (basado en models típics disponibles)
+    const availableModels = [
+        'gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-flash-latest', 'gemini-2.0-flash', 'gemma-3-4b-it'
+    ];
+
+    modelSelect.innerHTML = availableModels.map(m => `<option value="${m}">${m}</option>`).join('');
+
+    // Cargar valors guardats
+    apiKeyInput.value = API_KEY || '';
+    if (USER_SELECTED_MODEL) {
+        modelSelect.value = USER_SELECTED_MODEL;
+    } else if (availableModels.includes('gemma-3-4b-it')) {
+        // Si l'usuari no ha triat res, seleccionar per defecte el model que ha funcionat
+        modelSelect.value = 'gemma-3-4b-it';
+    }
+
+    saveBtn.addEventListener('click', () => {
+        const val = apiKeyInput.value.trim();
+        const chosen = modelSelect.value;
+        if (!val) {
+            statusDiv.textContent = 'Introdueix una clau API vàlida.';
+            statusDiv.style.color = 'red';
+            return;
+        }
+
+        API_KEY = val;
+        USER_SELECTED_MODEL = chosen;
+        localStorage.setItem('eduai_api_key', API_KEY);
+        localStorage.setItem('eduai_model', USER_SELECTED_MODEL);
+
+        statusDiv.textContent = 'Clau i model guardats.';
+        statusDiv.style.color = 'green';
+        setTimeout(() => statusDiv.textContent = '', 4000);
+    });
+}
+
 // Inicialitzar
 (async () => {
     await FileDatabase.init();
@@ -452,4 +514,7 @@ userInput.addEventListener('keypress', (e) => {
     if (window.location.hash === '#dashboard' && !currentUser) {
         navigateTo('home'); // Redirecciona a la pàgina d'inici si s'intenta establir un enllaç profund sense autenticació.
     }
+
+    // Inicialitzar UI de configuració d'IA (clau i model)
+    initAIConfigUI();
 })();
